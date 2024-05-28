@@ -1,13 +1,14 @@
 import fs from "fs";
 import csv from "csv-parser";
 import Book from "../models/Book.js";
+import User from "../models/User.js";
+import { where } from "sequelize";
 
 export const addBooksFromCSV = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
-
     const results = [];
     const errors = [];
 
@@ -68,3 +69,37 @@ export const addBooksFromCSV = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const allSellerBooks = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    try {
+      const books = await Book.findAll({where:{UserId:userId}});
+      res.json(books);
+    } catch (error) {
+      console.error("Error retrieving books:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  } catch (error) {}
+};
+
+// async function findBooksByUserId(userId) {
+//   try {
+//     // Find the user by ID
+//     const user = await User.findByPk(userId);
+
+//     if (!user) {
+//       // Handle case where user does not exist
+//       return [];
+//     }
+
+//     // Use the association to find all books belonging to the user
+//     const books = await user.getBooks();
+
+//     return books;
+//   } catch (error) {
+//     // Handle any errors
+//     console.error('Error finding books by user ID:', error);
+//     throw new Error('Error finding books by user ID');
+//   }
+// }
