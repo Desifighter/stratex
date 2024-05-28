@@ -1,5 +1,4 @@
-// modals/User.js
-// modals/User.js
+
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db.js';
 

@@ -42,7 +42,7 @@ export const registerController = async (req, res) => {
 
 export const loginController = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(201).send({
@@ -67,7 +67,7 @@ export const loginController = async (req, res) => {
       });
     }
     //token
-    const token = await JWT.sign({ id: details.id, }, process.env.JWT_SECRET, {
+    const token = await JWT.sign({ _id: details.id, }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
     res.status(200).send({

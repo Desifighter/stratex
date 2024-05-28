@@ -1,5 +1,5 @@
 import JWT from "jsonwebtoken";
-import User from "../models/User";
+import User from "../models/User.js";
 
 // protected routes token base
 export const requireSignIn = async (req, res, next) => {
@@ -9,7 +9,7 @@ export const requireSignIn = async (req, res, next) => {
       process.env.JWT_SECRET
     );
     req.user = decode;
-    console.log(decode);
+    // console.log(decode);
     next();
   } catch (error) {
     res.status(401).send({
@@ -24,8 +24,8 @@ export const requireSignIn = async (req, res, next) => {
 // Seller access
 export const isSeller = async (req, res, next) => {
   try {
-    const user = await User.findOne({ where: { id:req.user.id } });
-    console.log(user);
+    const user = await User.findOne({ where: { id:req.user._id } });
+    // console.log(user);
     if (user.role !== "seller") {
       res.status(401).send({
         success: false,
