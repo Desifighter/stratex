@@ -1,8 +1,6 @@
 import fs from "fs";
 import csv from "csv-parser";
 import Book from "../models/Book.js";
-import User from "../models/User.js";
-import { where } from "sequelize";
 
 export const addBooksFromCSV = async (req, res) => {
   try {
@@ -70,36 +68,83 @@ export const addBooksFromCSV = async (req, res) => {
   }
 };
 
+// for View All Books of Users
 export const allSellerBooks = async (req, res) => {
   try {
     const userId = req.user._id;
     try {
-      const books = await Book.findAll({where:{UserId:userId}});
+      const books = await Book.findAll({ where: { UserId: userId } });
       res.json(books);
     } catch (error) {
       console.error("Error retrieving books:", error);
       res.status(500).json({ message: "Internal server error" });
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
 };
 
-// async function findBooksByUserId(userId) {
-//   try {
-//     // Find the user by ID
-//     const user = await User.findByPk(userId);
+// Update a book by its ID
+export const updateBookById = async (req, res) => {
+  const bookId = req.params.bookid;
+  const { title, author, price, publishedDate } = req.body;
 
-//     if (!user) {
-//       // Handle case where user does not exist
-//       return [];
-//     }
+  try {
+    const book = await Book.findByPk(bookId);
 
-//     // Use the association to find all books belonging to the user
-//     const books = await user.getBooks();
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+    console.log(book.UserId);
+    console.log(req.user._id);
+    if(book.UserId != req.user._id){
+      return res.status(404).json({ message: "Remember You Never Listed This Book Bro \n \n So You Can Not Upadte It" });
+    }
 
-//     return books;
-//   } catch (error) {
-//     // Handle any errors
-//     console.error('Error finding books by user ID:', error);
-//     throw new Error('Error finding books by user ID');
-//   }
-// }
+    // Update the book with the provided details
+    await book.update({
+      title: title || book.title,
+      author: author || book.author,
+      price: price || book.price,
+      publishedDate: publishedDate || book.publishedDate,
+    });
+
+    res.json({ message: "Book updated successfully", updatedBook: book });
+  } catch (error) {
+    console.error("Error updating book:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Delete a book by its ID
+export const deleteBookById = async (req, res) => {
+  const bookId = req.params.bookid;
+
+  try {
+    const book = await Book.findByPk(bookId);
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+    console.log(book);
+    console.log(book.UserId);
+    console.log(req.user._id);
+    if (book.UserId != req.user._id) {
+      return res
+        .status(404)
+        .json({
+          message:
+            "Remember You Never Listed This Book Bro \n \n So You Can Not Delete It",
+        });
+    }
+
+    // Delete the book
+    await book.destroy();
+
+    res.json({ message: "Book deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting book:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

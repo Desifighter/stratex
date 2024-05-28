@@ -22,7 +22,7 @@ export const registerController = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role:(role)?role:1,
+        role:(role&&role==2)?2:1,
     });
     console.log(newUser);
     res.status(201).send({
@@ -35,7 +35,7 @@ export const registerController = async (req, res) => {
     res.status(500).send({
       success: false,
       message: error.message,
-      error,
+      error: error.parent.sqlMessage,
     });
   }
 };
