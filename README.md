@@ -58,7 +58,7 @@ This project is a REST backend using Node.js, Express.js, MySQL (or PostgreSQL),
       "name": "keshav keshari",
       "email": "keshavhero@gmail.com",
       "password": "123456",
-      "role": "1" or "2" (1 for buyer and 2 for seller)
+      "role": "1" //or "2" (1 for buyer and 2 for seller)
   }
   ```
 
